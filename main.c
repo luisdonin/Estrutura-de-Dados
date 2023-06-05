@@ -27,6 +27,7 @@ int imprime(int Matr[][MAX], int linhas, int colunas){
         printf("\n");
     }
   printf("\n");
+  return 0;//put on commit 
 }
 
 int main(void) {
