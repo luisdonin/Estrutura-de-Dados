@@ -1,38 +1,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
-
 typedef struct Node {
     int vert;
     struct Node* prox;
-}node;
+} node;
 
-node* createNode(int);
-
-typedef struct {
-    int numVertx;
-    node** adjList;
-}graph;
-
-node *createNode(int v){
-    node *newNode = (node*)malloc(sizeof(node*));
+node* createNode(int v) {
+    node* newNode = (node*)malloc(sizeof(node));
     newNode->vert = v;
     newNode->prox = NULL;
     return newNode;
 }
 
-graph* createGraph(int vertices){
-    int i=0;
+typedef struct {
+    int numVertx;
+    node** adjList;
+} graph;
+
+graph* createGraph(int vertices) {
+    int i;
     graph* grafo = (graph*)malloc(sizeof(graph));
     grafo->numVertx = vertices;
-    grafo->adjList = malloc(vertices * sizeof(graph));//checar com professor
-    for(i = 0; i < vertices; i++)
+    grafo->adjList = (node**)malloc(vertices * sizeof(node*));
+    for (i = 0; i < vertices; i++)
         grafo->adjList[i] = NULL;
     return grafo;
 }
 
-void addEdge(graph* grafo, int s, int d){
+void addEdge(graph* grafo, int s, int d) {
     node* newNode = createNode(d);
     newNode->prox = grafo->adjList[s];
     grafo->adjList[s] = newNode;
@@ -42,15 +38,15 @@ void addEdge(graph* grafo, int s, int d){
     grafo->adjList[d] = newNode;
 }
 
-void printGraph(graph* grafo){
-    int v = 0;
-    for(v = 0; v <grafo->numVertx; v++){
+void printGraph(graph* grafo) {
+    int v;
+    for (v = 0; v < grafo->numVertx; v++) {
         node* tmp = grafo->adjList[v];
-        printf("\n Vertice: %d", v);
-        while(tmp){
+        printf("\nVertex %d:", v);
+        while (tmp) {
+            printf(" %d", tmp->vert);
             tmp = tmp->prox;
         }
         printf("\n");
     }
-
 }
