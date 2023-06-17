@@ -7,110 +7,110 @@
 #define MAXM 100
 
 int N, M;
-char caveMap[MAXN][MAXM];
-bool visited[MAXN][MAXM];
+char map_caverna[MAXN][MAXM];
+bool visitados[MAXN][MAXM];
 
-void DFS(int i, int j, int* count) {
-    if (i < 0 || i >= N || j < 0 || j >= M || caveMap[i][j] == 'x' || visited[i][j]) {
+void busca_profundidade(int i, int j, int* count) {
+    if (i < 0 || i >= N || j < 0 || j >= M || map_caverna[i][j] == 'x' || visitados[i][j]) {
         return;
     }
 
-    visited[i][j] = true;
+    visitados[i][j] = true;
     (*count)++;
 
-    DFS(i - 1, j, count);
-    DFS(i + 1, j, count);
-    DFS(i, j - 1, count);
-    DFS(i, j + 1, count);
+    busca_profundidade(i - 1, j, count);
+    busca_profundidade(i + 1, j, count);
+    busca_profundidade(i, j - 1, count);
+    busca_profundidade(i, j + 1, count);
 }
 
-void processRegioesCommand() {
+void regioes() {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < M; j++) {
-            visited[i][j] = false;
+            visitados[i][j] = false;
         }
     }
 
-    int numRegions = 0;
-    int maxRegionSize = 0;
+    int num_regioes = 0;
+    int tam_max_regioes = 0;
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < M; j++) {
-            if (caveMap[i][j] == '.' && !visited[i][j]) {
-                numRegions++;
+            if (map_caverna[i][j] == '.' && !visitados[i][j]) {
+                num_regioes++;
                 int count = 0;
-                DFS(i, j, &count);
-                if (count > maxRegionSize) {
-                    maxRegionSize = count;
+                busca_profundidade(i, j, &count);
+                if (count > tam_max_regioes) {
+                    tam_max_regioes = count;
                 }
             }
         }
     }
 
-    printf("%d regioes; a maior tem area %d\n", numRegions, maxRegionSize);
+    printf("%d regiao(s); a maior tem area %d\n", num_regioes, tam_max_regioes);
 }
 
-int distance[MAXN][MAXM];
-int queue[MAXN * MAXM];
-int front, rear;
+int dist[MAXN][MAXM];
+int fila[MAXN * MAXM];
+int inicio, fim;
 
-void BFS(int i1, int j1, int i2, int j2) {
+void busca_largura(int i1, int j1, int i2, int j2) {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < M; j++) {
-            distance[i][j] = -1;
+            dist[i][j] = -1;
         }
     }
 
-    front = rear = 0;
+    inicio = fim = 0;
 
-    distance[i1][j1] = 0;
-    queue[rear++] = i1 * M + j1;
+    dist[i1][j1] = 0;
+    fila[fim++] = i1 * M + j1;
 
-    while (front != rear) {
-        int currentVertex = queue[front++];
-        int currentI = currentVertex / M;
-        int currentJ = currentVertex % M;
+    while (inicio != fim) {
+        int vert_atual = fila[inicio++];
+        int i_atual = vert_atual / M;
+        int j_atual = vert_atual % M;
 
-        if (currentI > 0 && caveMap[currentI - 1][currentJ] == '.' && distance[currentI - 1][currentJ] == -1) {
-            distance[currentI - 1][currentJ] = distance[currentI][currentJ] + 1;
-            queue[rear++] = (currentI - 1) * M + currentJ;
+        if (i_atual > 0 && map_caverna[i_atual - 1][j_atual] == '.' && dist[i_atual - 1][j_atual] == -1) {
+            dist[i_atual - 1][j_atual] = dist[i_atual][j_atual] + 1;
+            fila[fim++] = (i_atual - 1) * M + j_atual;
         }
-        if (currentI < N - 1 && caveMap[currentI + 1][currentJ] == '.' && distance[currentI + 1][currentJ] == -1) {
-            distance[currentI + 1][currentJ] = distance[currentI][currentJ] + 1;
-            queue[rear++] = (currentI + 1) * M + currentJ;
+        if (i_atual < N - 1 && map_caverna[i_atual + 1][j_atual] == '.' && dist[i_atual + 1][j_atual] == -1) {
+            dist[i_atual + 1][j_atual] = dist[i_atual][j_atual] + 1;
+            fila[fim++] = (i_atual + 1) * M + j_atual;
         }
-        if (currentJ > 0 && caveMap[currentI][currentJ - 1] == '.' && distance[currentI][currentJ - 1] == -1) {
-            distance[currentI][currentJ - 1] = distance[currentI][currentJ] + 1;
-            queue[rear++] = currentI * M + currentJ - 1;
+        if (j_atual > 0 && map_caverna[i_atual][j_atual - 1] == '.' && dist[i_atual][j_atual - 1] == -1) {
+            dist[i_atual][j_atual - 1] = dist[i_atual][j_atual] + 1;
+            fila[fim++] = i_atual * M + j_atual - 1;
         }
-        if (currentJ < M - 1 && caveMap[currentI][currentJ + 1] == '.' && distance[currentI][currentJ + 1] == -1) {
-            distance[currentI][currentJ + 1] = distance[currentI][currentJ] + 1;
-            queue[rear++] = currentI * M + currentJ + 1;
+        if (j_atual < M - 1 && map_caverna[i_atual][j_atual + 1] == '.' && dist[i_atual][j_atual + 1] == -1) {
+            dist[i_atual][j_atual + 1] = dist[i_atual][j_atual] + 1;
+            fila[fim++] = i_atual * M + j_atual + 1;
         }
     }
 
-    if (distance[i2][j2] == -1) {
+    if (dist[i2][j2] == -1) {
         printf("Nao ha caminho de (%d,%d) para (%d,%d)\n", i1, j1, i2, j2);
     } else {
-        printf("De (%d,%d) para (%d,%d) em %d passos\n", i1, j1, i2, j2, distance[i2][j2]);
+        printf("De (%d,%d) para (%d,%d) em %d passos\n", i1, j1, i2, j2, dist[i2][j2]);
     }
 }
 
-void processCamCommand() {
+void cam() {
     int i1, j1, i2, j2;
     scanf("%d %d %d %d", &i1, &j1, &i2, &j2);
-    BFS(i1, j1, i2, j2);
+    busca_largura(i1, j1, i2, j2);
 }
 
-void processDotCommand() {
+void ponto() {
     int i, j;
     scanf("%d %d", &i, &j);
-    caveMap[i][j] = '.';
+    map_caverna[i][j] = '.';
 }
 
 void printMap() {
     for (int i = 0; i < N; i++) {
         for (int j = 0; j < M; j++) {
-            printf("%c", caveMap[i][j]);
+            printf("%c", map_caverna[i][j]);
         }
         printf("\n");
     }
@@ -120,19 +120,19 @@ int main() {
     scanf("%d %d", &N, &M);
 
     for (int i = 0; i < N; i++) {
-        scanf("%s", caveMap[i]);
+        scanf("%s", map_caverna[i]);
     }
 
-    char command[10];
-    while (scanf("%s", command) != EOF) {
-        if (strcmp(command, "regioes") == 0) {
-            processRegioesCommand();
-        } else if (strcmp(command, "cam") == 0) {
-            processCamCommand();
-        } else if (strcmp(command, ".") == 0) {
-            processDotCommand();
+    char comando[10];
+    while (scanf("%s", comando) != EOF) {
+        if (strcmp(comando, "regioes") == 0) {
+            regioes();
+        } else if (strcmp(comando, "cam") == 0) {
+            cam();
+        } else if (strcmp(comando, ".") == 0) {
+            ponto();
             printMap();
-        } else if (strcmp(command, "F") == 0) {
+        } else if (strcmp(comando, "F") == 0) {
             break;
         }
     }
